@@ -10,7 +10,9 @@
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/express": "^5.0.1"
+    "@types/express": "^5.0.1",
+    "@drawapp/backend-common": "workspace:*",
+    "@drawapp/common": "workspace:*"
   },
   "keywords": [],
   "author": "Moksh",
