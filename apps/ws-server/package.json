@@ -9,16 +9,18 @@
     "dev": "npm run build && npm run start"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
-    "@types/ws": "^8.18.1",
     "@drawapp/backend-common": "workspace:*",
     "@drawapp/common": "workspace:*",
-    "@drawapp/DB": "workspace:*"
+    "@drawapp/db": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/ws": "^8.18.1"
   },
   "keywords": [],
   "author": "Moksh",
   "license": "ISC",
   "dependencies": {
+    "jsonwebtoken": "^9.0.2",
     "ws": "^8.18.1"
   }
 }
