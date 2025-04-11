@@ -23,7 +23,6 @@ interface User{
 const users: User[] = [];
 
 const wss = new WebSocketServer({port : 8080});
-
 //  setup ws connection
 wss.on('connection',(ws,Request )=>{
 const url = Request.url;
@@ -49,62 +48,75 @@ users.push({
   userId, 
 })
 
-// handle Message
-ws.on("message",async(message)=>{
-  let parsedData;
-  if(typeof message !== "string"){
-    parsedData = JSON.parse(message.toString())
-  }else{
-    parsedData = JSON.parse(message)
-  }
-  // switch case
-  switch (parsedData.type) {
-    case "join":{
-      const user = users.find(x => x.ws === ws)
-      if(!user){
-        return;
-      }
-      user?.rooms.push(parsedData.roomId)
-      break;
-    }  
-    case "chat":{
-      // find room
-      const roomId = parsedData.roomId;
-      const message = parsedData.message;
-       await prismaClient.chat.create({
-        data:{
-          roomId: Number(roomId),
-          message,
-          userId
-        }
-       })
+// message controller
 
-       users.forEach((user)=>{
-        if(user.rooms.includes(userId)){
-          user.ws.send(JSON.stringify({
-            type:"chat",
-            message:message,
-            roomId
-          }))
-        }
-       })
-      break;
-    }
-    case "leave":{
-      const user = users.find(x => x.ws === ws);
-      if(!user){
-        return;
-      }
-      user.rooms = user?.rooms.filter(x => x === parsedData.room)
-    }
-      break;
+ws.on("message", async function message (data){
+  if(!data){
+    return;
+  }
+  let parsedData = JSON.parse(data as unknown as string);
+
+  if (!parsedData.type) {
+    console.log("Invalid message type");
+    return;
+  }
+try {
   
-    default:
-      console.log('Unknown message type');
-  }
-})
-
-// handle disconnect
+    // ... rest of the code
+    switch (parsedData.type) {
+      case "join":{
+        const user = users.find(x => x.ws === ws);
+        if(!user){
+          return;
+        }
+         user.rooms.push(parsedData.roomId);
+      }
+        break;
+  
+      case "leave":{
+        const user = users.find(x => x.ws === ws);
+        if(!user){
+          return;
+        }
+         user.rooms = user.rooms.filter(x => x !== parsedData.roomId)
+      }
+        break;
+  
+      case "chat":{
+        const roomId = parsedData.payload.roomId;
+        const message = parsedData.payload.message;
+  
+        await prismaClient.chat.create({
+          data:{
+            message:message,
+            roomId:roomId,
+            userId:userId
+          }
+        })
+  
+        users.forEach((user)=>{
+          if(user.rooms.includes(roomId)){
+            user.ws.send(JSON.stringify({
+              type:"chat",
+              payload:{
+                message:message,
+                roomId,
+                userId,
+              }
+            }))
+          }
+        })
+      }
+        break;
+    
+      default:
+      console.log("please provide valid type")
+        break;
+    }
+} catch (err) {
+  console.log("Error message :- ", err)
+}
+       // handle disconnect
 ws.on("close",()=>{
   console.log("Disconnected from server")
 })
@@ -113,4 +125,6 @@ ws.on("close",()=>{
 ws.onerror=(err)=>{
 console.log("Error occuried", err)
 }
+})
+
 })
