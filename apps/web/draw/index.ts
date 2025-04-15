@@ -6,7 +6,7 @@ interface Shapes{
   type: "rect"
 }
 
-export function initDraw(canvas:HTMLCanvasElement, ctx:CanvasRenderingContext2D, socket:WebSocket){
+export function initDraw(canvas:HTMLCanvasElement, ctx:CanvasRenderingContext2D, socket:WebSocket|null){
   let scrollX = 0;
   let scrollY = 0;
   let clicked = false;
